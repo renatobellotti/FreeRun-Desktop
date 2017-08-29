@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   </head>
   <body>
+    <!-- navigation bar -->
     <nav class="navbar navbar-inverse">
         <div id="navbarCollapse" class="collapse navbar-collapse">
 
@@ -33,13 +34,13 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Scan this code to trnasfer your tracks to this computer:</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
           </div>
                 <div class="modal-body">
-                    <img src="{% static "freerun/img/placeholder.jpg" %}" class="img-responsive">
+                    <canvas id="qr-code"></canvas>
                 </div>
             </div>
         </div>
@@ -52,5 +53,18 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    
+    <!-- QR code generator -->
+    <script src="{% static "freerun/js/qrious.min.js" %}"></script>
+    
+    <script>
+        // code from https://github.com/neocotic/qrious
+        (function() {
+            var qr = new QRious({
+            element: document.getElementById('qr-code'),
+            value: 'test'
+            }); 
+        })(); 
+    </script>
   </body>
 </html>
