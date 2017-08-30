@@ -34,17 +34,52 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Scan this code to transfer your tracks to this computer:</h5>
+                    <h5 class="modal-title text-center" id="exampleModalLabel">Scan this code to transfer your tracks to this computer:</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
           </div>
-                <div class="modal-body">
+                <div class="modal-body text-center">
                     <canvas id="qr-code"></canvas>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- selection of files -->
+    <!--
+        Each list item has an id that is the basename of the file.
+        For example, if the file name is "1504022873.gpx", then the id of the list item is "1504022873".
+    -->
+    <div id="file_selection" class="text-center">
+        <ul id="selected_files_list">
+        </ul>
+        <button type="button" id="open_add_files_dialogue" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i></button>
+    </div>
+    <hr>
+    
+    <!-- dialogue to select the files to display -->
+    <div id="add_file_dialogue" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            
+                <div class="modal-header">
+                    <h5 class="modal-title text-center">Select the file(s) you want to display:</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            
+                <div class="modal-body">
+                    <form id="add_file_dialogue_checkboxes"></form>
+                    <button type="submit" class="btn btn-success" id="add_files">Add</button>
+                    <button type="button" class="close" data-dismiss="modal">Cancel</button>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+    
     
     <!-- font awesome CDN -->
     <script src="https://use.fontawesome.com/2c119aafc8.js"></script>
@@ -56,7 +91,6 @@
     
     <!-- QR code generator -->
     <script src="{% static "freerun/js/qrious.min.js" %}"></script>
-    
     <script>
         // code from https://github.com/neocotic/qrious
         (function() {
@@ -66,6 +100,65 @@
             value: '{{ ip }}'
             }); 
         })(); 
+    </script>
+    
+    <!-- UI code -->
+    <script>
+        "use strict";
+        
+        var filesList = JSON.parse("{{ list_of_datafiles | escapejs }}");
+        var listOfDisplayedFiles = [];
+        
+        function update_add_file_dialogue(){
+            var dialogContent = "";
+            
+            // only allow to select files that are not already displayed
+            for(var i=0; i<filesList.length; ++i){
+                var file = filesList[i];
+                if(listOfDisplayedFiles.indexOf(file) === -1){
+                    file = file.replace(".gpx", "");
+                    dialogContent += '<div class="row" id="' + file +'"><input type="checkbox" value="' + file + '">' + file + '</input></div>';
+                }
+            }
+            
+            $("#add_file_dialogue_checkboxes").html(dialogContent);
+        };
+        
+        $("#open_add_files_dialogue").on("click", function(event){
+            update_add_file_dialogue();
+            $("#add_file_dialogue").modal("show");
+        });
+        
+        $("#add_files").on("click", function(event){
+            var checkboxes = $("#add_file_dialogue_checkboxes").find(":checkbox");
+            
+            var content = $("#selected_files_list").html();
+            for(var i=0; i<checkboxes.length; ++i){
+                var checkbox = checkboxes[i];
+                if(checkbox.checked){
+                    // add all the new files to the list of the displayed data files
+                    // and add a botton (with a cross in a circle) to remove it again
+                    var value = checkbox.value;
+                    content += '<li style="list-style-type:none" id="' + value + '">' + value +
+                        '<button onclick="handleDeleteEvent(this);" style="background:none; border:none;" id="delete_' + value + '">' +
+                        '<i class="fa fa-times-circle" aria-hidden="true"></i>\
+                        </button></li>';
+                    
+                    listOfDisplayedFiles.push(value + ".gpx");
+                }
+            }
+            
+            $("#selected_files_list").html(content);
+            $("#add_file_dialogue").modal("hide");
+        });
+        
+        function handleDeleteEvent(caller){
+            var id = caller.id;
+            id = id.replace("delete_", "#");
+            $(id).remove();
+            var filename = id.replace("#", "") + ".gpx";
+            listOfDisplayedFiles.splice(listOfDisplayedFiles.indexOf(filename), 1);
+        }
     </script>
   </body>
 </html>
