@@ -80,6 +80,20 @@
         </div>
     </div>
     
+    <!-- the actual content:
+        in the left half of the screen, there is the map
+        in the right part, there are the graphs for velocity, altitude etc. -->
+    <div id="content">
+        
+        <div id="map_container" class="col-md-6">
+        </div>
+        
+        <div id="analysis_container" class="cold-md-6">
+        </div>
+        
+    </div>
+    
+    
     
     <!-- font awesome CDN -->
     <script src="https://use.fontawesome.com/2c119aafc8.js"></script>
@@ -102,14 +116,33 @@
         })(); 
     </script>
     
-    <!-- UI code -->
+    <!-- OpenLayers map -->
+    <script src="https://openlayers.org/en/v4.3.1/build/ol.js" type="text/javascript"></script>
     <script>
-        "use strict";
-        
+        var map = new ol.Map({
+            target: 'map_container',
+            layers: [
+              new ol.layer.Tile({
+                source: new ol.source.OSM()
+              })
+            ],
+            view: new ol.View({
+              center: ol.proj.fromLonLat([{{ start_lon }}, {{ start_lat }}]),
+              zoom: 14
+            })
+        });
+    </script>
+    
+    <!-- UI code -->
+    <script src="{% static "freerun/js/ui_code.js" %}"></script>
+    <script>
         // not in the same file as the other js code because the list comes from Django
         var filesList = JSON.parse("{{ list_of_datafiles | escapejs }}");
         var listOfDisplayedFiles = [];
+        
+        // just start with the first, i. e. the oldest (?) element:
+        listOfDisplayedFiles.push(filesList[0]);
+        updateUI();
     </script>
-    <script src="{% static "freerun/js/ui_code.js" %}"></script>
   </body>
 </html>

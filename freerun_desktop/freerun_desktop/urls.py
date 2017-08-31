@@ -16,11 +16,12 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from freerun.views import index, get_file
+from freerun.views import index, get_file, get_data
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^index/', index, name='index'),
     url(r'get_file/(?P<filename>.+)', get_file, name='get_file'),
+    url(r'get_data/(?P<filename>.+)', get_data, name='get_data'),
     url(r'$', index, name='index'),
 ]
