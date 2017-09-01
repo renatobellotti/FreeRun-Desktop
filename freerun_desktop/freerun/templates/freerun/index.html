@@ -135,42 +135,8 @@
         });
     </script>
     
-    <!-- 
-    <!-- to display charts using ChartJS
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
-    <script>
-        "use strict";
-        
-        var ctx = $("#speed_plot");
-        var speedChart = new Chart(ctx, {
-            type: "line",
-            options: {
-                elements: {
-                    line: {
-                        tension: 0, // disables bezier curves
-                    }
-                }
-            }
-        });
-        
-    </script>
-    -->
     <!-- Plot the graphs using Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script>
-        //alert("plot started");
-        /*var layout = {
-            title:'Line and Scatter Plot'
-        };
-        Plotly.newPlot("speed_plot", [{
-            x: [0, 1, 1.5],
-            y: [0, 1, 0.5],
-            mode: 'lines'
-        }], layout);*/
-        
-        //alert("plot finished");
-    </script>
-    
     
     <!-- UI code -->
     <script src="{% static "freerun/js/ui_code.js" %}"></script>
