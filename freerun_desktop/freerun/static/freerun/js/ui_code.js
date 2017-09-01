@@ -71,9 +71,18 @@ function handleDeleteEvent(caller){
 function updateUI(){
     // first remove all layers
     var layers = map.getLayers().getArray();
-    for(var i=0; i<layers.length; ++i){
+    /*for(var i=0; i<layers.length; ++i){
         if(!(layers[i] instanceof ol.layer.Tile)){
             map.removeLayer(layers[i]);
+            // start again at the beginning because the indices changed
+            i = 0;
+        }
+    }*/
+    // iterate in reverse order because items are removed during the iteration --> indices change
+    for(var i=layers.length-1; i>=0; --i){
+        if(!(layers[i] instanceof ol.layer.Tile)){
+            map.removeLayer(layers[i]);
+            // no need to adjust the loop variable because the later elements are either non-existent or Tile objects (else they would have been removed)
         }
     }
     
@@ -81,6 +90,13 @@ function updateUI(){
     for(var i=0; i<listOfDisplayedFiles.length; ++i){
         add_gpx_layer(listOfDisplayedFiles[i]);
     }
+    
+    // add all curves
+    /*for(var i=0; i<listOfDisplayedFiles.length; ++i){
+        add_curves(listOfDisplayedFiles[i]);
+    }*/
+    //alert("updateUI");
+    plot_curves(listOfDisplayedFiles);
     
     updateListOfDisplayedFiles();
 }
@@ -128,4 +144,113 @@ function add_gpx_layer(filename){
     });
     
     map.addLayer(vector);
+}
+
+// add another curve to the velocity and elevation graphs
+/*function add_curves(filename){
+    $.getJSON("get_data/" + filename, function(data){
+        //alert(data);
+        var times = data.time;
+        var speeds = data.speed;
+        //var datapoints = [];
+        /*for(var i=0; i<times.length; ++i){
+            datapoints.push({x: times[i], y: speeds[i]});
+        }*/
+        
+        //speeds = [0, 1, 0.5];
+        //  var l = [0, 1, 2];
+        
+        /*datapoints = [
+            {x: 0., y: 0.},
+            {x: 0.5, y: 0.5},
+            {x: 1., y: 1.},
+        ];
+        
+        var dataset = [
+            {
+                label: filename,
+                data: speeds,
+                fill: false
+            }
+        ];
+        
+        var scales = {
+            xAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Value'
+                },
+                ticks: {
+                    min: times[0],
+                    max: times[times.length - 1],
+                    stepSize: 10
+                }
+            }]
+        };
+        
+        speedChart.data.labels = times;
+        speedChart.data.datasets = dataset;
+        speedChart.options.scales = scales;
+        speedChart.update();
+    });
+}*/
+
+var loaded_data = {};
+
+function load_data(filename){
+    return $.getJSON("get_data/" + filename)
+            .done(function(data){
+                //alert(data);
+                // convert time to minutes and speed to km/h
+                for(var i=0; i<data.time.length; ++i){
+                    data.time[i] /= 60;
+                    data.speed[i] *= 3.6;
+                }
+                loaded_data[filename] = data;
+            });
+}
+
+// add another curve to the velocity and elevation graphs
+function plot_curves(filenames){
+    //alert("plot curves");
+    var requests = [];
+    // load the data if necessary
+    for(var i=0; i<filenames.length; ++i){
+        if(!(filenames[i] in loaded_data)){
+            requests.push(load_data(filenames[i]));
+        }
+    }
+    
+    var speedDataToPlot = [];
+    
+    //alert("before when");
+    
+    // execute this when all requests are done, i. e. all data is loaded
+    $.when(...requests).then(function(){
+        //alert("in when");
+        var test = loaded_data;
+        Object.keys(loaded_data).forEach(function(key){
+            var data = loaded_data[key];
+            var speedCurve = {
+                x: data.time,
+                y: data.speed,
+                mode: "lines"
+            }
+            //alert("push");
+            speedDataToPlot.push(speedCurve);
+        });
+        
+        var speedLayout = {
+            title: "Speed",
+            xaxis: {
+                title: "Time [min]"
+            },
+            yaxis: {
+                title: "Speed [km/h]"
+            }
+        };
+        
+        Plotly.newPlot("speed_plot", speedDataToPlot, speedLayout);
+    });
+    
 }

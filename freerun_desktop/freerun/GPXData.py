@@ -31,7 +31,8 @@ class GPXData:
                 self._data_elevation.append(point.elevation)
                 self._data_speed.append(segment.get_speed(point_index))
 
-        # TODO: add speed and time (measured from first GPS fix)
+        # the first speed value is null --> fix this
+        self._data_speed[0] = 0.
 
         self._data = {
             'time': self._data_time,
