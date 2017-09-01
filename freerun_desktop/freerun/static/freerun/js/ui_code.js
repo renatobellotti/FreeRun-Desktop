@@ -201,10 +201,12 @@ function load_data(filename){
     return $.getJSON("get_data/" + filename)
             .done(function(data){
                 //alert(data);
-                // convert time to minutes and speed to km/h
+                // convert time to minutes and speed to km/h, elevation data should only contain the difference to the start point
+                var initialElevation = data.elevation[0];
                 for(var i=0; i<data.time.length; ++i){
                     data.time[i] /= 60;
                     data.speed[i] *= 3.6;
+                    data.elevation[i] -= initialElevation;
                 }
                 loaded_data[filename] = data;
             });
@@ -222,8 +224,7 @@ function plot_curves(filenames){
     }
     
     var speedDataToPlot = [];
-    
-    //alert("before when");
+    var elevationDataToPlot = [];
     
     // execute this when all requests are done, i. e. all data is loaded
     $.when(...requests).then(function(){
@@ -235,9 +236,16 @@ function plot_curves(filenames){
                 x: data.time,
                 y: data.speed,
                 mode: "lines"
+            };
+            
+            var elevationCurve = {
+                x: data.time,
+                y: data.elevation,
+                mode: "lines"
             }
-            //alert("push");
+            
             speedDataToPlot.push(speedCurve);
+            elevationDataToPlot.push(elevationCurve);
         });
         
         var speedLayout = {
@@ -250,7 +258,18 @@ function plot_curves(filenames){
             }
         };
         
+        var elevationLayout = {
+            title: "Height differences",
+            xaxis: {
+                title: "Time [min]"
+            },
+            yaxis: {
+                title: "Elevation difference [m]"
+            }
+        };
+        
         Plotly.newPlot("speed_plot", speedDataToPlot, speedLayout);
+        Plotly.newPlot("elevation_plot", elevationDataToPlot, elevationLayout);
     });
     
 }
