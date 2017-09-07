@@ -10,7 +10,7 @@ At the moment it is possible to display tracks from single-track single-track-se
 # Installation
 - Clone the repo: ```git clone git@github.com:renatobellotti/FreeRun-Desktop.git```
 - ```cd FreeRun-Desktop```
-- Add a Font-Awesome key:
+- Add a Font-Awesome key (NOTE: Currently not necessary; skip this step):
 
   ```cp freerun_desktop/freerun_desktop/api_keys_template.py freerun_desktop/freerun_desktop/api_keys.py```
   
