@@ -10,7 +10,8 @@ function update_add_file_dialogue(){
         var file = filesList[i];
         if(listOfDisplayedFiles.indexOf(file) === -1){
             file = file.replace(".gpx", "");
-            dialogContent += '<div class="row" id="' + file +'"><input type="checkbox" value="' + file + '">' + file + '</input></div>';
+            var date = new Date(parseInt(file)*1000);
+            dialogContent += '<div class="row" id="' + file +'"><input type="checkbox" value="' + file + '">' + date.toLocaleDateString() + '</input></div>';
         }
     }
     
@@ -42,9 +43,11 @@ $("#add_files").on("click", function(event){
 
 // add all the new files to the list of the displayed data files
 // and add a botton (with a cross in a circle) to remove it again
-function produce_row(value){
-    return '<li style="list-style-type:none" id="' + value + '">' + value +
-                '<button onclick="handleDeleteEvent(this);" style="background:none; border:none;" id="delete_' + value + '">' +
+function produce_row(filename){
+    var stamp = filename.replace(".gpx", "");
+    var date = new Date(parseInt(stamp)*1000);
+    return '<li style="list-style-type:none" id="' + filename + '">' + date.toLocaleDateString() +
+                '<button onclick="handleDeleteEvent(this);" style="background:none; border:none;" id="delete_' + filename + '">' +
                 '<i class="fa fa-times-circle" aria-hidden="true"></i>\
                 </button></li>';
 }
@@ -169,16 +172,21 @@ function plot_curves(filenames){
     // execute this when all requests are done, i. e. all data is loaded
     $.when(...requests).then(function(){
         listOfDisplayedFiles.forEach(function(filename){
+            var date = new Date(parseInt(filename.replace(".gpx", ""))*1000);
+            var label = date.toLocaleDateString();
+            
             var data = loaded_data[filename];
             var speedCurve = {
                 x: data.time,
                 y: data.speed,
+                name: label,
                 mode: "lines"
             };
             
             var elevationCurve = {
                 x: data.time,
                 y: data.elevation,
+                name: label,
                 mode: "lines"
             }
             
