@@ -168,9 +168,8 @@ function plot_curves(filenames){
     
     // execute this when all requests are done, i. e. all data is loaded
     $.when(...requests).then(function(){
-        var test = loaded_data;
-        Object.keys(loaded_data).forEach(function(key){
-            var data = loaded_data[key];
+        listOfDisplayedFiles.forEach(function(filename){
+            var data = loaded_data[filename];
             var speedCurve = {
                 x: data.time,
                 y: data.speed,
