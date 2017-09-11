@@ -146,13 +146,54 @@ function load_data(filename){
     return $.getJSON("get_data/" + filename)
             .done(function(data){
                 // convert time to minutes and speed to km/h, elevation data should only contain the difference to the start point
-                var initialElevation = data.elevation[0];
-                for(var i=0; i<data.time.length; ++i){
-                    data.time[i] /= 60;
-                    data.speed[i] *= 3.6;
-                    data.elevation[i] -= initialElevation;
+                var initialElevation = null;
+                var filteredData = {
+                    time: [],
+                    speed: [],
+                    elevation: []
+                };
+                
+                // filter the data:
+                // setup filter parameters and tools
+                var VELOCITY_LIMIT = 30./3.6;
+                var AVERAGE_N = 50;
+                var last_speeds = [];
+                
+                function average_array(arr){
+                    var sum = 0.;
+                    for(var i=0; i<arr.length; ++i){
+                        sum += arr[i];
+                    }
+                    return sum/arr.length;
                 }
-                loaded_data[filename] = data;
+                
+                // filter
+                for(var i=0; i<data.time.length; ++i){
+                    // remove first minute because the data in this time interval might not be precise (tested using a Fairphone 1)
+                    if(data.time[i] < 60){
+                        continue;
+                    }else if(initialElevation === null){
+                        initialElevation = data.elevation[i];
+                    }
+                    
+                    // remove points where the velocity is too big
+                    if(data.speed[i] >= VELOCITY_LIMIT){
+                        continue;
+                    }
+                    
+                    // average the velocities
+                    if(last_speeds.length == AVERAGE_N){
+                        last_speeds.shift();
+                    }
+                    last_speeds.push(data.speed[i]);
+                    
+                    filteredData.time.push(data.time[i]/60);
+                    filteredData.speed.push(average_array(last_speeds)*3.6);
+                    filteredData.elevation.push(data.elevation[i] - initialElevation);
+                }
+                
+                
+                loaded_data[filename] = filteredData;
             });
 }
 
