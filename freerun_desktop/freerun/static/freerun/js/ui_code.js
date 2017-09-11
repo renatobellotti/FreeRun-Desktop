@@ -85,8 +85,10 @@ function updateUI(){
         add_gpx_layer(listOfDisplayedFiles[i]);
     }
     
+    // plot speed and elevation curves
     plot_curves(listOfDisplayedFiles);
     
+    // show the user what files are currently displayed
     updateListOfDisplayedFiles();
 }
 
