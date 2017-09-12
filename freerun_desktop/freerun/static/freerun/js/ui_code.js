@@ -1,5 +1,12 @@
 "use strict";
 
+// orange, blue, green, brown, magenta, black
+var COLOURS = ["#ff6600", "#0000ff", "#00ff00", "#663300", "#cc0099", "#000000"];
+
+function get_colour(filename){
+    return COLOURS[listOfDisplayedFiles.indexOf(filename) % COLOURS.length];
+}
+
 // build the dialogue to select additional files to be displayed
 // TODO: return false if no files are available
 function update_add_file_dialogue(){
@@ -97,7 +104,7 @@ function updateUI(){
 
 // add a GPX file as a layer to the map
 function add_gpx_layer(filename){
-    // code from https://openlayers.org/en/latest/examples/gpx.html?q=gpx
+    // code adapted from https://openlayers.org/en/latest/examples/gpx.html?q=gpx
     var style = {
         'Point': new ol.style.Style({
           image: new ol.style.Circle({
@@ -119,7 +126,7 @@ function add_gpx_layer(filename){
         }),
         'MultiLineString': new ol.style.Style({
           stroke: new ol.style.Stroke({
-            color: '#0f0',
+            color: get_colour(filename),
             width: 3
           })
         })
@@ -230,14 +237,20 @@ function plot_curves(filenames){
                 x: data.time,
                 y: data.speed,
                 name: label,
-                mode: "lines"
+                mode: "lines",
+                line: {
+                    color: get_colour(filename)
+                }
             };
             
             var elevationCurve = {
                 x: data.time,
                 y: data.elevation,
                 name: label,
-                mode: "lines"
+                mode: "lines",
+                line: {
+                    color: get_colour(filename)
+                }
             }
             
             speedDataToPlot.push(speedCurve);
