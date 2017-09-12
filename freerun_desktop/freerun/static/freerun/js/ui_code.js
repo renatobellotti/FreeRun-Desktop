@@ -156,7 +156,7 @@ function load_data(filename){
                 // filter the data:
                 // setup filter parameters and tools
                 var VELOCITY_LIMIT = 30./3.6;
-                var AVERAGE_N = 50;
+                var AVERAGE_N = 31;  // should be an odd integer
                 var last_speeds = [];
                 
                 function average_array(arr){
@@ -181,16 +181,25 @@ function load_data(filename){
                         continue;
                     }
                     
-                    // average the velocities
-                    if(last_speeds.length == AVERAGE_N){
-                        last_speeds.shift();
-                    }
-                    last_speeds.push(data.speed[i]);
-                    
                     filteredData.time.push(data.time[i]/60);
-                    filteredData.speed.push(average_array(last_speeds)*3.6);
+                    filteredData.speed.push(data.speed[i]*3.6);
                     filteredData.elevation.push(data.elevation[i] - initialElevation);
                 }
+                
+                // average over AVERAGE_N points around each point
+                var half_width = Math.floor(AVERAGE_N/2);
+                var averagedSpeed = filteredData.speed.slice();
+                // move the window with centre index i
+                for(var i=half_width; i+half_width<filteredData.time.length; ++i){
+                    var sum = 0.;
+                    // take the average over the window of size AVERAGE_N
+                    for(var j=i-half_width; j<=i+half_width; ++j){
+                        sum += filteredData.speed[j];
+                    }
+                    averagedSpeed[i] = sum/AVERAGE_N;
+                }
+                
+                filteredData.speed = averagedSpeed
                 
                 
                 loaded_data[filename] = filteredData;
