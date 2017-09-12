@@ -46,8 +46,8 @@ $("#add_files").on("click", function(event){
 function produce_row(filename){
     var stamp = filename.replace(".gpx", "");
     var date = new Date(parseInt(stamp)*1000);
-    return '<li style="list-style-type:none" id="' + filename + '">' + date.toLocaleDateString() +
-                '<button onclick="handleDeleteEvent(this);" style="background:none; border:none;" id="delete_' + filename + '">' +
+    return '<li style="list-style-type:none" id="' + stamp + '">' + date.toLocaleDateString() +
+                '<button onclick="handleDeleteEvent(this);" style="background:none; border:none;" id="delete_' + stamp + '">' +
                 '<i class="fa fa-times-circle" aria-hidden="true"></i>\
                 </button></li>';
 }
